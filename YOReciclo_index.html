@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>YO RECICLO — Cada acción cuenta</title>
+  <meta name="description" content="YO RECICLO - App y web para aprender a reciclar: busca residuos, conoce el contenedor correcto, encuentra puntos de reciclaje y gana medallas." />
+  <link rel="icon" href="logo.png" />
+  <style>
+    :root{
+      --green:#238636;
+      --muted:#6b7280;
+      --card:#f8fafc;
+      --accent:#10b981;
+      --maxw:1000px;
+    }
+    *{box-sizing:border-box}
+    body{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; margin:0; color:#0f172a; background:linear-gradient(180deg,#f7fdf8 0%, #ffffff 100%);}
+    header{background:linear-gradient(90deg, rgba(35,134,54,0.06), rgba(16,185,129,0.03)); padding:28px 16px; border-bottom:1px solid rgba(0,0,0,0.04);}
+    .container{max-width:var(--maxw); margin:0 auto; padding:0 16px;}
+    .brand{display:flex; align-items:center; gap:14px;}
+    .brand img{width:64px; height:64px; border-radius:12px; object-fit:cover; background:#fff; padding:8px; box-shadow:0 6px 18px rgba(15,23,42,0.06);}
+    h1{font-size:20px; margin:0}
+    p.lead{margin:6px 0 0; color:var(--muted); font-size:14px}
+    .hero{display:grid; grid-template-columns:1fr 420px; gap:28px; align-items:center; padding:28px 0;}
+    .card{background:#fff; padding:18px; border-radius:12px; box-shadow:0 6px 20px rgba(15,23,42,0.06);}
+    .search{display:flex; gap:8px; align-items:center;}
+    .search input{flex:1; padding:12px 14px; border-radius:10px; border:1px solid #e6eef2; font-size:15px;}
+    .btn{background:var(--green); color:white; padding:10px 14px; border-radius:10px; border:none; cursor:pointer; font-weight:600;}
+    .small{font-size:13px; color:var(--muted);}
+    .features{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:18px;}
+    .feature{background:var(--card); padding:12px; border-radius:10px; text-align:center;}
+    .feature h4{margin:8px 0 6px}
+    .map-placeholder{height:260px; border-radius:10px; background:linear-gradient(180deg,#eef9f1,#ffffff); display:flex; align-items:center; justify-content:center; color:var(--muted); font-weight:600; border:1px dashed #d1fae5;}
+    .section{margin:22px 0;}
+    footer{padding:18px 0; border-top:1px solid rgba(0,0,0,0.04); margin-top:22px;}
+    .grid-2{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
+    .medals{display:flex; gap:8px; flex-wrap:wrap;}
+    .medal{background:white; padding:8px 10px; border-radius:8px; box-shadow:0 6px 18px rgba(15,23,42,0.03); font-weight:600; font-size:13px;}
+    @media (max-width:880px){ .hero{grid-template-columns:1fr; } .features{grid-template-columns:repeat(2,1fr);} .grid-2{grid-template-columns:1fr;} }
+    @media (max-width:520px){ .features{grid-template-columns:1fr;} .brand img{width:48px; height:48px} h1{font-size:18px} }
+    /* Accessibility focus */
+    .btn:focus, input:focus {outline:3px solid rgba(16,185,129,0.18); outline-offset:3px;}
+    .sr-only{position:absolute; left:-10000px; top:auto; width:1px; height:1px; overflow:hidden;}
+    .result{margin-top:12px; padding:12px; border-radius:8px; background:#f0fdf4; color:var(--green); font-weight:700;}
+    .result.bad{background:#fff1f2; color:#b91c1c;}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="brand">
+        <img src="logo.png" alt="Logo YO RECICLO" id="logo">
+        <div>
+          <h1>YO RECICLO</h1>
+          <p class="lead">Cada acción cuenta — Aprende a separar, participa y gana medallas.</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" role="main">
+    <section class="hero">
+      <div>
+        <div class="card" aria-labelledby="search-title">
+          <h2 id="search-title">¿Qué hago con este residuo?</h2>
+          <p class="small">Escribe el nombre del residuo (ej.: botella de plástico, cáscara de plátano) o selecciona una categoría.</p>
+          <div style="height:12px"></div>
+          <div class="search" role="search" aria-label="Buscador de residuos">
+            <input id="query" type="text" placeholder="Escribe el residuo..." aria-label="Buscar residuo" />
+            <button class="btn" id="searchBtn">Buscar</button>
+          </div>
+          <div id="resultArea" aria-live="polite"></div>
+
+          <div class="section">
+            <h3 style="margin:0 0 8px">Categorías rápidas</h3>
+            <div class="features" role="list">
+              <div class="feature" role="listitem"><strong>Plástico</strong><div class="small">Contenedor amarillo</div></div>
+              <div class="feature" role="listitem"><strong>Vidrio</strong><div class="small">Contenedor verde</div></div>
+              <div class="feature" role="listitem"><strong>Papel</strong><div class="small">Contenedor azul</div></div>
+              <div class="feature" role="listitem"><strong>Orgánicos</strong><div class="small">Contenedor marrón</div></div>
+              <div class="feature" role="listitem"><strong>No reciclable</strong><div class="small">Contenedor gris</div></div>
+              <div class="feature" role="listitem"><strong>Pilas</strong><div class="small">Punto de acopio especial</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="height:18px"></div>
+
+        <div class="card" role="region" aria-label="Descarga la app">
+          <h3 style="margin-top:0">Descarga la app</h3>
+          <p class="small">Próximamente en App Store y Google Play. Escanea el QR o descarga desde los enlaces.</p>
+          <div style="display:flex; gap:8px; margin-top:12px;">
+            <button class="btn" style="background:#111827">App Store</button>
+            <button class="btn" style="background:#0ea5a4">Google Play</button>
+          </div>
+        </div>
+
+      </div>
+
+      <aside>
+        <div class="card">
+          <h3 style="margin-top:0">Puntos de reciclaje</h3>
+          <div class="map-placeholder" id="map">Mapa (activo con permisos)</div>
+          <p class="small" style="margin-top:10px">Permite el acceso a tu ubicación para mostrar contenedores y centros cercanos.</p>
+        </div>
+
+        <div style="height:12px"></div>
+
+        <div class="card">
+          <h4 style="margin:0 0 8px">Sistema de medallas</h4>
+          <div class="medals" aria-hidden="false">
+            <div class="medal">🌱 Eco Novato — 50 pts</div>
+            <div class="medal">🌿 Reciclador Activo — 150 pts</div>
+            <div class="medal">🌳 Héroe Verde — 300 pts</div>
+            <div class="medal">🌍 Guardián — 600 pts</div>
+          </div>
+          <p class="small" style="margin-top:8px">Gana puntos clasificando residuos y participando en retos comunitarios.</p>
+        </div>
+      </aside>
+    </section>
+
+    <section class="card section" aria-labelledby="about-title">
+      <h3 id="about-title">Sobre YO RECICLO</h3>
+      <p class="small">YO RECICLO es una plataforma que combina educación, tecnología y acción comunitaria para mejorar la gestión de residuos. Incluye buscador de residuos, mapas, guía de buenas prácticas y un sistema de recompensas.</p>
+      <div style="height:10px"></div>
+      <div class="grid-2">
+        <div>
+          <h4>Objetivo</h4>
+          <p class="small">Promover la correcta clasificación y gestión de residuos mediante una plataforma accesible y fácil de usar.</p>
+        </div>
+        <div>
+          <h4>ODS</h4>
+          <p class="small">Alineado con ODS 12 y ODS 13: consumo responsable y acción por el clima.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="card section" aria-labelledby="contact-title">
+      <h3 id="contact-title">Contacta y colabora</h3>
+      <p class="small">¿Quieres que YO RECICLO llegue a tu institución o comunidad? Escríbenos:</p>
+      <form id="contactForm" onsubmit="event.preventDefault(); alert('Formulario enviado (demo)');">
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <input type="text" name="name" placeholder="Nombre" style="flex:1; padding:10px; border-radius:8px; border:1px solid #e6eef2;" required>
+          <input type="email" name="email" placeholder="Correo" style="flex:1; padding:10px; border-radius:8px; border:1px solid #e6eef2;" required>
+        </div>
+        <div style="height:8px"></div>
+        <textarea name="message" rows="3" placeholder="Mensaje" style="width:100%; padding:10px; border-radius:8px; border:1px solid #e6eef2;"></textarea>
+        <div style="height:8px"></div>
+        <button class="btn" type="submit">Enviar</button>
+      </form>
+    </section>
+
+  </main>
+
+  <footer class="container">
+    <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+      <div class="small">© 2025 YO RECICLO. Todos los derechos reservados.</div>
+      <div class="small">Política de privacidad · Términos · Contacto</div>
+    </div>
+  </footer>
+
+<script>
+/* Datos de ejemplo: mapea residuo -> {container, colorName, note} */
+const sampleDB = {
+  "botella de plástico": {container:"Amarillo", color:"#f59e0b", note:"Enjuaga y aplasta antes de reciclar."},
+  "vidrio": {container:"Verde", color:"#16a34a", note:"Retira tapas y enjuaga."},
+  "papel": {container:"Azul", color:"#3b82f6", note:"Seco y sin plastificados."},
+  "cartón": {container:"Azul", color:"#3b82f6", note:"Aplasta cajas grandes."},
+  "cáscara de plátano": {container:"Marrón", color:"#92400e", note:"Residuos orgánicos para compost."},
+  "pilas": {container:"Punto especial", color:"#1f2937", note:"Entregar en punto de acopio."},
+  "lata": {container:"Amarillo", color:"#f59e0b", note:"Lávalas y aplástalas si es posible."}
+};
+
+const searchBtn = document.getElementById('searchBtn');
+const query = document.getElementById('query');
+const resultArea = document.getElementById('resultArea');
+
+function showResult(item, found){
+  resultArea.innerHTML = '';
+  const div = document.createElement('div');
+  if(found){
+    div.className = 'result';
+    div.innerHTML = `${item.container} — ${item.note}`;
+    div.style.borderLeft = '6px solid ' + item.color;
+  } else {
+    div.className = 'result bad';
+    div.innerHTML = 'No se encontró el residuo en la base de datos. Intenta otra búsqueda o selecciona una categoría.';
+    div.style.borderLeft = '6px solid #f43f5e';
+  }
+  resultArea.appendChild(div);
+}
+
+searchBtn.addEventListener('click', () => {
+  const q = query.value.trim().toLowerCase();
+  if(!q){ query.focus(); return; }
+  const item = sampleDB[q];
+  if(item){
+    showResult(item, true);
+  } else {
+    // try fuzzy match
+    const keys = Object.keys(sampleDB);
+    const foundKey = keys.find(k => k.includes(q) || q.includes(k));
+    if(foundKey) showResult(sampleDB[foundKey], true);
+    else showResult({}, false);
+  }
+});
+
+// basic geolocation hint for map placeholder
+const mapBox = document.getElementById('map');
+mapBox.addEventListener('click', () => {
+  if(!navigator.geolocation){
+    alert('Geolocalización no soportada por tu navegador.');
+    return;
+  }
+  mapBox.innerText = 'Obteniendo ubicación…';
+  navigator.geolocation.getCurrentPosition(pos => {
+    const {latitude, longitude} = pos.coords;
+    mapBox.innerText = `Tu ubicación: ${latitude.toFixed(5)}, ${longitude.toFixed(5)}\nBusca puntos de reciclaje cercanos en la app.`;
+  }, err => {
+    mapBox.innerText = 'Permiso denegado o error obteniendo ubicación.';
+  }, {timeout:10000});
+});
+</script>
+</body>
+</html>
